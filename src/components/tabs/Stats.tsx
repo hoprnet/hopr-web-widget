@@ -1,102 +1,14 @@
 import React from "react";
+import { observer } from "mobx-react";
+import hopr from "../../stores/hopr";
 import Table from "../Table";
+import { channelsToTableData } from "../../utils";
 
 const tableHeaders = ["From", "To", "Amount", "Opened", "Status"];
 
-const tableData = [
-  {
-    from: {
-      link:
-        "https://etherscan.io/address/0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
-      address: "0xde0..."
-    },
-    to: {
-      link:
-        "https://etherscan.io/address/0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
-      address: "0xde0..."
-    },
-    amount: 12345.23,
-    date: "Aug 1 '19",
-    status: "CLOSED"
-  },
-  {
-    from: {
-      link:
-        "https://etherscan.io/address/0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
-      address: "0xde0..."
-    },
-    to: {
-      link:
-        "https://etherscan.io/address/0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
-      address: "0xde0..."
-    },
-    amount: 12345.23,
-    date: "Aug 2 '19",
-    status: "PENDING"
-  },
-  {
-    from: {
-      link:
-        "https://etherscan.io/address/0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
-      address: "0xde0..."
-    },
-    to: {
-      link:
-        "https://etherscan.io/address/0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
-      address: "0xde0..."
-    },
-    amount: 12345.23,
-    date: "Aug 3 '19",
-    status: "OPEN"
-  },
-  {
-    from: {
-      link:
-        "https://etherscan.io/address/0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
-      address: "0xde0..."
-    },
-    to: {
-      link:
-        "https://etherscan.io/address/0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
-      address: "0xde0..."
-    },
-    amount: 12345.23,
-    date: "Aug 4 '19",
-    status: "CLOSED"
-  },
-  {
-    from: {
-      link:
-        "https://etherscan.io/address/0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
-      address: "0xde0..."
-    },
-    to: {
-      link:
-        "https://etherscan.io/address/0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
-      address: "0xde0..."
-    },
-    amount: 12345.23,
-    date: "Aug 5 '19",
-    status: "PENDING"
-  },
-  {
-    from: {
-      link:
-        "https://etherscan.io/address/0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
-      address: "0xde0..."
-    },
-    to: {
-      link:
-        "https://etherscan.io/address/0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
-      address: "0xde0..."
-    },
-    amount: 12345.23,
-    date: "Aug 6 '19",
-    status: "OPEN"
-  }
-];
+const Stats = observer(() => {
+  const tableData = channelsToTableData(Array.from(hopr.channels.values()));
 
-const Stats = () => {
   return (
     <div id="stats-container" className="content-container">
       <div className="title">
@@ -142,6 +54,6 @@ const Stats = () => {
       `}</style>
     </div>
   );
-};
+});
 
 export default Stats;

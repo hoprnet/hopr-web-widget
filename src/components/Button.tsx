@@ -1,14 +1,14 @@
 import React from "react";
 
-interface IButton {
-  onClick?: any;
+interface IButtonPros {
   children?: any;
-  style?: any;
+  onClick?: (...args: any[]) => any;
+  style?: React.CSSProperties;
 }
 
-const Button = ({ onClick, children, style }: IButton) => {
+const Button = ({ children, style, onClick }: IButtonPros) => {
   return (
-    <div className="button" onClick={onClick} style={style}>
+    <div className="button" style={style} onClick={onClick}>
       {children}
 
       <style>{`

@@ -1,22 +1,34 @@
 import React from "react";
 
-interface ITable {
-  headers: any;
-  data?: any;
+export interface ITableProps {
+  headers: string[];
+  data: {
+    from: {
+      link: string;
+      address: string;
+    };
+    to: {
+      link: string;
+      address: string;
+    };
+    amount: string;
+    date: string;
+    status: string;
+  }[];
 }
 
-const returnTableHeaders = (headers: any) => {
+const returnTableHeaders = (headers: ITableProps["headers"]) => {
   return (
     <tr>
-      {headers.map((header: string) => (
+      {headers.map(header => (
         <th>{header}</th>
       ))}
     </tr>
   );
 };
 
-const returnTableData = (data: any) => {
-  return data.map((row: any) => {
+const returnTableData = (data: ITableProps["data"]) => {
+  return data.map(row => {
     return (
       <tr>
         <td>
@@ -39,7 +51,7 @@ const returnTableData = (data: any) => {
   });
 };
 
-const Table = ({ headers, data }: ITable) => {
+const Table = ({ headers, data }: ITableProps) => {
   return (
     <div className="table">
       <table>
@@ -48,50 +60,50 @@ const Table = ({ headers, data }: ITable) => {
       </table>
 
       <style>{`
-          .table-button {
-            background: var(--primary-color);
-            outline: 2px solid var(--btn-border);
-            color: var(--alt-font-color);
-            outline-offset: -2px;
-            font-weight: bold;
-            cursor: pointer;
-            padding: 0;
-          }
+        .table-button {
+          background: var(--primary-color);
+          outline: 2px solid var(--btn-border);
+          color: var(--alt-font-color);
+          outline-offset: -2px;
+          font-weight: bold;
+          cursor: pointer;
+          padding: 0;
+        }
 
-          .table-button:hover {
-            opacity: 80%;
-            outline-color: var(--font-color);
-          }
+        .table-button:hover {
+          opacity: 80%;
+          outline-color: var(--font-color);
+        }
 
-          .table-button:active {
-            outline-color: var(--font-color);
-            background-color: #5a5454;
-          }
-          .table {
-            width: 620px;
-          }
+        .table-button:active {
+          outline-color: var(--font-color);
+          background-color: #5a5454;
+        }
+        .table {
+          width: 620px;
+        }
 
-          table {
-            border-collapse: collapse;
-            width: 100%;
-          }
+        table {
+          border-collapse: collapse;
+          width: 100%;
+        }
 
-          th {
-            border: 2px solid var(--border-color);
-            background: var(--primary-color);
-            color: var(--alt-font-color);
-            text-align: center;
-            font-size: 18px;
-            padding: 8px;
-          }
-          td {
-            border: 2px solid var(--border-color);
-            background: var(--chart-content-color);
-            font-size: 16px;
-            text-align: center;
-            padding: 8px;
-          }
-          `}</style>
+        th {
+          border: 2px solid var(--border-color);
+          background: var(--primary-color);
+          color: var(--alt-font-color);
+          text-align: center;
+          font-size: 18px;
+          padding: 8px;
+        }
+        td {
+          border: 2px solid var(--border-color);
+          background: var(--chart-content-color);
+          font-size: 16px;
+          text-align: center;
+          padding: 8px;
+        }
+      `}</style>
     </div>
   );
 };

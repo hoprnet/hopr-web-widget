@@ -14,6 +14,11 @@ const Web3Model = types
     get exists() {
       return !!self.web3;
     },
+
+    get ready() {
+      return typeof self.networkId !== "undefined";
+    },
+
     get unlocked() {
       return !!self.account;
     }
@@ -22,9 +27,24 @@ const Web3Model = types
     setAccount(account: string) {
       self.account = account;
     },
+
     setNetworkId(networkId: number) {
       self.networkId = networkId;
-    }
+    },
+
+    getMetamaskState: flow(function* getMetamaskState() {
+      if (!self.exists) {
+        throw Error("web3 does not exist");
+      }
+
+      const [account]: string[] = yield self.web3!.eth.getAccounts();
+      const networkId: number = yield self.web3!.eth.net.getId();
+
+      return {
+        account,
+        networkId
+      };
+    })
   }))
   .actions(self => ({
     initialize: flow<void, any[]>(function* initialize() {
@@ -46,10 +66,11 @@ const Web3Model = types
 
       // update current account
       if (self.web3) {
-        const [initialAccount] = yield self.web3.eth.getAccounts();
+        const {
+          account: initialAccount,
+          networkId
+        } = yield self.getMetamaskState();
         self.setAccount(initialAccount);
-
-        const networkId = yield self.web3.eth.net.getId();
         self.setNetworkId(networkId);
       }
 
@@ -64,12 +85,23 @@ const Web3Model = types
             self.setAccount(newAccount);
           });
       }
+    }),
+
+    unlock: flow<void, any[]>(function* unlock() {
+      if (self.unlocked) return;
+
+      if (window.ethereum) {
+        try {
+          yield window.ethereum.enable();
+
+          const { account, networkId } = yield self.getMetamaskState();
+          self.setAccount(account);
+          self.setNetworkId(networkId);
+        } catch (error) {
+          console.error(error);
+        }
+      }
     })
-  }))
-  .actions(self => ({
-    afterCreate() {
-      self.initialize();
-    }
   }));
 
 export default Web3Model;

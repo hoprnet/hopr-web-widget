@@ -1,111 +1,56 @@
-import React from "react";
+import React, { useState } from "react";
+import { observer } from "mobx-react";
 import Input from "../Input";
 import Table from "../Table";
 import Button from "../Button";
+import web3 from "../../stores/web3";
+import hopr from "../../stores/hopr";
+import { minifyAddress, channelsToTableData } from "../../utils";
 
 const tableHeaders = ["From", "To", "Amount", "Opened", "Status"];
 
-const tableData = [
-  {
-    from: {
-      link:
-        "https://etherscan.io/address/0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
-      address: "0xde0..."
-    },
-    to: {
-      link:
-        "https://etherscan.io/address/0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
-      address: "0xde0..."
-    },
-    amount: 12345.23,
-    date: "Aug 1 '19",
-    status: "WITHDRAW"
-  },
-  {
-    from: {
-      link:
-        "https://etherscan.io/address/0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
-      address: "0xde0..."
-    },
-    to: {
-      link:
-        "https://etherscan.io/address/0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
-      address: "0xde0..."
-    },
-    amount: 12345.23,
-    date: "Aug 2 '19",
-    status: "PENDING"
-  },
-  {
-    from: {
-      link:
-        "https://etherscan.io/address/0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
-      address: "0xde0..."
-    },
-    to: {
-      link:
-        "https://etherscan.io/address/0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
-      address: "0xde0..."
-    },
-    amount: 12345.23,
-    date: "Aug 3 '19",
-    status: "WITHDRAW"
-  },
-  {
-    from: {
-      link:
-        "https://etherscan.io/address/0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
-      address: "0xde0..."
-    },
-    to: {
-      link:
-        "https://etherscan.io/address/0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
-      address: "0xde0..."
-    },
-    amount: 12345.23,
-    date: "Aug 4 '19",
-    status: "CLOSED"
-  },
-  {
-    from: {
-      link:
-        "https://etherscan.io/address/0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
-      address: "0xde0..."
-    },
-    to: {
-      link:
-        "https://etherscan.io/address/0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
-      address: "0xde0..."
-    },
-    amount: 12345.23,
-    date: "Aug 5 '19",
-    status: "PENDING"
-  },
-  {
-    from: {
-      link:
-        "https://etherscan.io/address/0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
-      address: "0xde0..."
-    },
-    to: {
-      link:
-        "https://etherscan.io/address/0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
-      address: "0xde0..."
-    },
-    amount: 12345.23,
-    date: "Aug 6 '19",
-    status: "OPEN"
-  }
-];
+const Stakes = observer(() => {
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const [amount, setAmount] = useState("");
 
-const Stakes = () => {
+  const list = Array.from(hopr.channels.values()).filter(channel => {
+    return channel.sender === web3.account;
+  });
+
+  const tableData = channelsToTableData(list);
+
+  const stake = () => {
+    hopr.createChannel({
+      funder: web3.account!,
+      sender: from,
+      recipient: to,
+      amount: web3.web3?.utils.toWei(amount, "ether")!
+    });
+  };
+
   return (
     <div id="stake-container" className="content-container">
       <div className="top">
         <h2>Open New Channel</h2>
 
-        <div className="wallet-info">Your Wallet Address: 0xaBc123...</div>
-        <div className="wallet-info">Balance: 123.45 HOPR</div>
+        <div className="wallet-info">
+          Your Wallet Address:{" "}
+          {web3.account ? (
+            <a
+              href={`https://etherscan.io/address/${web3.account}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {minifyAddress(web3.account)}
+            </a>
+          ) : (
+            "?"
+          )}
+        </div>
+        <div className="wallet-info">
+          Balance: {web3.account ? hopr.balanceInHopr : "?"} HOPR
+        </div>
       </div>
 
       <div className="align-inputs">
@@ -113,20 +58,31 @@ const Stakes = () => {
           type="text"
           label="FROM:"
           undertext="(That's usually your address)"
+          onChange={e => setFrom(e.target.value)}
+          value={from}
         />
         <Input
           type="text"
           label="TO:"
           undertext="(Some other relayer's address)"
+          onChange={e => setTo(e.target.value)}
+          value={to}
         />
-        <Input type="number" label="AMOUNT:" undertext="(In HOPR tokens)" />
+        <Input
+          type="number"
+          label="AMOUNT:"
+          undertext="(In HOPR tokens)"
+          onChange={e => setAmount(e.target.value)}
+          value={amount}
+        />
       </div>
-      <Button>STAKE</Button>
+      <Button onClick={stake}>STAKE</Button>
       <div className="title">
         <h2>You Staked</h2>
       </div>
 
       <Table headers={tableHeaders} data={tableData} />
+
       <style>{`
         .align-inputs {
           height: 150px;
@@ -173,6 +129,6 @@ const Stakes = () => {
       `}</style>
     </div>
   );
-};
+});
 
 export default Stakes;

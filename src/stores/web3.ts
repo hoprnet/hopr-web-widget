@@ -1,3 +1,8 @@
 import Web3 from "../models/Web3";
 
-export default Web3.create();
+const web3 = Web3.create();
+
+// initialize immediately
+web3.initialize().catch(console.error);
+
+export default web3;
