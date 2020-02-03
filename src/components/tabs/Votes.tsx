@@ -6,8 +6,8 @@ const Votes = () => {
     <div id="votes-container" className="content-container">
       <div className="title">
         <h2>Voting for HOPR DAO</h2>
-        <div className="font-12">[coming soon...]</div>
       </div>
+      <div className="content font-12">[coming soon...]</div>
       {/* 
     <div className="title">
       <h2>Vote Title</h2>
@@ -147,6 +147,14 @@ const Votes = () => {
           width: 0px;
           height: 0px;
           margin: 0px !important;
+        }
+
+        .content {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+          height: 100%;
         }
       `}</style>
     </div>

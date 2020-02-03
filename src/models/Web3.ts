@@ -87,8 +87,8 @@ const Web3Model = types
       }
     }),
 
-    unlock: flow<void, any[]>(function* unlock() {
-      if (self.unlocked) return;
+    unlock: flow<boolean, any[]>(function* unlock() {
+      if (self.unlocked) return true;
 
       if (window.ethereum) {
         try {
@@ -97,10 +97,16 @@ const Web3Model = types
           const { account, networkId } = yield self.getMetamaskState();
           self.setAccount(account);
           self.setNetworkId(networkId);
+
+          return true;
         } catch (error) {
           console.error(error);
+
+          return false;
         }
       }
+
+      return false;
     })
   }));
 

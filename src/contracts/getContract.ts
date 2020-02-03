@@ -3,7 +3,7 @@ import HoprTokenAbi from "./abis/HoprToken.json";
 import HoprChannelsAbi from "./abis/HoprChannels.json";
 import addresses from "./addresses.json";
 
-type Contract = InstanceType<Web3["eth"]["Contract"]>;
+export type Contract = InstanceType<Web3["eth"]["Contract"]>;
 
 const contracts = {
   HoprToken: {

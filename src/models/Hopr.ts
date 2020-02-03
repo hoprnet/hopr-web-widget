@@ -1,5 +1,5 @@
 import { types, flow } from "mobx-state-tree";
-import getContract from "../contracts/getContract";
+import getContract, { Contract } from "../contracts/getContract";
 import web3Store from "../stores/web3";
 
 export const Channel = types
@@ -35,12 +35,20 @@ export const Channel = types
 const Hopr = types
   .model("Hopr", {
     balance: "0",
-    channels: types.map(Channel)
+    channels: types.map(Channel),
+    devMode: window.location.origin.includes("localhost")
   })
   .views(self => ({
     get balanceInHopr() {
       return web3Store.web3?.utils.fromWei(self.balance, "ether")!;
     }
+  }))
+  .volatile<{
+    hoprToken?: Contract;
+    hoprChannels?: Contract;
+  }>(self => ({
+    hoprToken: undefined,
+    hoprChannels: undefined
   }))
   .actions(self => ({
     updateBalance: flow(function* updateBalance() {
@@ -146,14 +154,8 @@ const Hopr = types
 
     return {
       setHashedSecret: flow(function* createChannel() {
-        const hoprChannels = getContract({
-          web3: web3Store.web3!,
-          name: "HoprChannels",
-          networkId: web3Store.networkId!
-        });
-
-        yield hoprChannels.methods
-          .setHashedSecret(
+        yield self
+          .hoprChannels!.methods.setHashedSecret(
             web3Store.web3?.utils.keccak256(web3Store.web3?.utils.randomHex(32))
           )
           .send({
@@ -168,31 +170,17 @@ const Hopr = types
         recipient: string;
         amount: string;
       }) {
-        const hoprToken = getContract({
-          web3: web3Store.web3!,
-          name: "HoprToken",
-          networkId: web3Store.networkId!
-        });
-
-        yield hoprToken.methods.mint(recipient, amount).send({
+        yield self.hoprToken!.methods.mint(recipient, amount).send({
           from: web3Store.account
         });
       }),
 
       approve: flow(function* createChannel({ amount }: { amount: string }) {
-        const hoprToken = getContract({
-          web3: web3Store.web3!,
-          name: "HoprToken",
-          networkId: web3Store.networkId!
-        });
-        const hoprChannels = getContract({
-          web3: web3Store.web3!,
-          name: "HoprChannels",
-          networkId: web3Store.networkId!
-        });
-
-        yield hoprToken.methods
-          .approve(hoprChannels.options.address, amount)
+        yield self
+          .hoprToken!.methods.approve(
+            self.hoprChannels!.options.address,
+            amount
+          )
           .send({
             from: web3Store.account
           });
@@ -209,28 +197,39 @@ const Hopr = types
         recipient: string;
         amount: string;
       }) {
-        const hoprChannels = getContract({
-          web3: web3Store.web3!,
-          name: "HoprChannels",
-          networkId: web3Store.networkId!
-        });
-
-        yield hoprChannels.methods
-          .createChannel(funder, sender, recipient, amount)
+        yield self
+          .hoprChannels!.methods.createChannel(
+            funder,
+            sender,
+            recipient,
+            amount
+          )
           .send({
             from: web3Store.account
           });
       }),
 
       initialize: flow(function* initialize() {
-        const hoprChannels = getContract({
+        self.hoprToken = getContract({
+          web3: web3Store.web3!,
+          name: "HoprToken",
+          networkId: web3Store.networkId!
+        });
+
+        self.hoprChannels = getContract({
           web3: web3Store.web3!,
           name: "HoprChannels",
           networkId: web3Store.networkId!
         });
 
-        // get balance
-        yield self.updateBalance();
+        if (!web3Store.unlocked) {
+          yield web3Store.unlock();
+        }
+
+        if (web3Store.unlocked) {
+          // get balance
+          yield self.updateBalance();
+        }
 
         // listen to hopr events
         if (typeof allEventsSubscription !== "undefined") {
@@ -239,7 +238,7 @@ const Hopr = types
             .unsubscribe();
         }
 
-        allEventsSubscription = hoprChannels.events
+        allEventsSubscription = self.hoprChannels.events
           .allEvents({
             fromBlock: 0,
             toBlock: "latest"

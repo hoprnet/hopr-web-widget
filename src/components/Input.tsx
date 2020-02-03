@@ -1,18 +1,23 @@
 import React from "react";
 
-interface IInputPros {
+interface IInputPros extends React.InputHTMLAttributes<any> {
   label: string;
   type?: string;
   undertext?: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => any;
-  value?: string;
 }
 
-const Input = ({ label, type, undertext, onChange, value }: IInputPros) => (
+const Input = ({
+  label,
+  type,
+  undertext,
+  onChange,
+  value,
+  ...props
+}: IInputPros) => (
   <>
     <div className="input-and-label">
       {label}
-      <input type={type} onChange={onChange} value={value} />
+      <input type={type} onChange={onChange} value={value} {...props} />
     </div>
 
     <div className="font-12">{undertext}</div>

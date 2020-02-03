@@ -1,14 +1,23 @@
 import React from "react";
 
-interface IButtonPros {
-  children?: any;
-  onClick?: (...args: any[]) => any;
-  style?: React.CSSProperties;
-}
-
-const Button = ({ children, style, onClick }: IButtonPros) => {
+const Button = ({
+  children,
+  style,
+  onClick,
+  disabled
+}: React.ButtonHTMLAttributes<any>) => {
   return (
-    <div className="button" style={style} onClick={onClick}>
+    <div
+      className={`button ${disabled ? "button-disabled" : ""}`}
+      style={style}
+      onClick={(...args) => {
+        if (disabled || !onClick) {
+          return;
+        }
+
+        onClick(...args);
+      }}
+    >
       {children}
 
       <style>{`
@@ -22,6 +31,11 @@ const Button = ({ children, style, onClick }: IButtonPros) => {
           align-items: center;
           justify-content: center;
           cursor: pointer;
+        }
+
+        .button-disabled {
+          opacity: 75%;
+          cursor: not-allowed;
         }
 
         .button:active {

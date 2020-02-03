@@ -6,7 +6,7 @@ const hopr = Hopr.create();
 
 // initialize once web3 is unlocked
 when(
-  () => web3Store.unlocked,
+  () => web3Store.ready,
   () => {
     hopr.initialize().catch(console.error);
   }

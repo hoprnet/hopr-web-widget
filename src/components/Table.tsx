@@ -21,7 +21,7 @@ const returnTableHeaders = (headers: ITableProps["headers"]) => {
   return (
     <tr>
       {headers.map(header => (
-        <th>{header}</th>
+        <th key={header}>{header}</th>
       ))}
     </tr>
   );
@@ -30,7 +30,7 @@ const returnTableHeaders = (headers: ITableProps["headers"]) => {
 const returnTableData = (data: ITableProps["data"]) => {
   return data.map(row => {
     return (
-      <tr>
+      <tr key={row.date}>
         <td>
           <a href={row.from.link} target="_blank" rel="noopener noreferrer">
             {row.from.address}
@@ -56,8 +56,11 @@ const Table = ({ headers, data }: ITableProps) => {
     <div className="table">
       <table>
         <thead>{returnTableHeaders(headers)}</thead>
-        <tbody>{returnTableData(data)}</tbody>
+        {data.length !== 0 ? <tbody>{returnTableData(data)}</tbody> : null}
       </table>
+      {data.length === 0 ? (
+        <div className="emptyTable">no payment channels found</div>
+      ) : null}
 
       <style>{`
         .table-button {
@@ -102,6 +105,11 @@ const Table = ({ headers, data }: ITableProps) => {
           font-size: 16px;
           text-align: center;
           padding: 8px;
+        }
+
+        .emptyTable {
+          text-align: center;
+          margin: 8px;
         }
       `}</style>
     </div>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { observer } from "mobx-react";
+import BN from "bn.js";
 import Input from "../Input";
 import Table from "../Table";
 import Button from "../Button";
@@ -12,7 +13,9 @@ const tableHeaders = ["From", "To", "Amount", "Opened", "Status"];
 const Stakes = observer(() => {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
-  const [amount, setAmount] = useState("");
+  const [unitAmount, setUnitAmount] = useState("");
+  const [error, setError] = useState<string | undefined>(undefined);
+  const stakingDisabled = from === "" || to === "" || unitAmount === "";
 
   const list = Array.from(hopr.channels.values()).filter(channel => {
     return channel.sender === web3.account;
@@ -20,13 +23,50 @@ const Stakes = observer(() => {
 
   const tableData = channelsToTableData(list);
 
-  const stake = () => {
-    hopr.createChannel({
-      funder: web3.account!,
-      sender: from,
-      recipient: to,
-      amount: web3.web3?.utils.toWei(amount, "ether")!
-    });
+  const stake = async () => {
+    setError(undefined);
+
+    try {
+      const funder = web3.account!;
+      const amount = web3.web3?.utils.toWei(unitAmount, "ether")!;
+
+      // not enough hopr
+      if (new BN(amount).gt(new BN(hopr.balance))) {
+        // testing purposes
+        if (hopr.devMode) {
+          await hopr.mint({
+            recipient: funder,
+            amount
+          });
+        } else {
+          return setError("not enough HOPR");
+        }
+      }
+
+      // unlock hopr
+      const allowance = await hopr
+        .hoprToken!.methods.allowance(
+          funder,
+          hopr.hoprChannels!.options.address
+        )
+        .call();
+      if (new BN(amount).gt(new BN(allowance))) {
+        await hopr.approve({ amount });
+      }
+
+      // create channel
+      await hopr.createChannel({
+        funder,
+        sender: from,
+        recipient: to,
+        amount
+      });
+
+      setError(undefined);
+    } catch (error) {
+      console.error(error);
+      setError("Unexpected error");
+    }
   };
 
   return (
@@ -55,6 +95,7 @@ const Stakes = observer(() => {
 
       <div className="align-inputs">
         <Input
+          title="An ethereum address"
           type="text"
           label="FROM:"
           undertext="(That's usually your address)"
@@ -62,6 +103,7 @@ const Stakes = observer(() => {
           value={from}
         />
         <Input
+          title="An ethereum address"
           type="text"
           label="TO:"
           undertext="(Some other relayer's address)"
@@ -69,14 +111,18 @@ const Stakes = observer(() => {
           value={to}
         />
         <Input
+          title="A number of HOPR tokens"
           type="number"
           label="AMOUNT:"
           undertext="(In HOPR tokens)"
-          onChange={e => setAmount(e.target.value)}
-          value={amount}
+          onChange={e => setUnitAmount(e.target.value)}
+          value={unitAmount}
         />
       </div>
-      <Button onClick={stake}>STAKE</Button>
+      <Button disabled={stakingDisabled} onClick={stake}>
+        STAKE
+      </Button>
+      {typeof error !== "undefined" ? error : null}
       <div className="title">
         <h2>You Staked</h2>
       </div>
