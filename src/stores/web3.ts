@@ -1,4 +1,4 @@
-import Web3 from "../models/Web3";
+import Web3 from "src/models/Web3";
 
 const web3 = Web3.create();
 

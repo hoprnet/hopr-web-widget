@@ -1,7 +1,7 @@
 import Web3 from "web3";
-import HoprTokenAbi from "./abis/HoprToken.json";
-import HoprChannelsAbi from "./abis/HoprChannels.json";
-import addresses from "./addresses.json";
+import HoprTokenAbi from "src/contracts/abis/HoprToken.json";
+import HoprChannelsAbi from "src/contracts/abis/HoprChannels.json";
+import addresses from "src/contracts/addresses.json";
 
 export type Contract = InstanceType<Web3["eth"]["Contract"]>;
 

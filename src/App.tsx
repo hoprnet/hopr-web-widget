@@ -1,20 +1,15 @@
 import React, { useState } from "react";
-// import { getSnapshot } from "mobx-state-tree";
-// import Web3 from "web3";
-// import hopr from "./stores/hopr";
-import Stakes from "./components/tabs/Stakes";
-import Stats from "./components/tabs/Stats";
-import Votes from "./components/tabs/Votes";
-import Toggle from "./components/Toggle";
-import Tabbar from "./components/Tabbar";
-import { light, dark } from "./themes";
+import tabs from "src/components/tabs";
+import Toggle from "src/components/Toggle";
+import Tabbar from "src/components/Tabbar";
+import themes from "src/themes";
 
 const App = () => {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
-  const [view, setView] = useState<"stats" | "stake" | "votes">("stats");
+  const [theme, setTheme] = useState<keyof typeof themes>("light");
+  const [view, setView] = useState<keyof typeof tabs>("Stats");
 
   return (
-    <div className="App" style={theme === "light" ? light : dark}>
+    <div className="App" style={theme === "light" ? themes.light : themes.dark}>
       <div className="background">
         <Tabbar selected={view} onSelect={newView => setView(newView)} />
         <Toggle
@@ -22,53 +17,14 @@ const App = () => {
           onToggle={() => setTheme(theme === "light" ? "dark" : "light")}
         />
 
-        {view === "stats" ? (
-          <Stats />
-        ) : view === "stake" ? (
-          <Stakes />
+        {view === "Stats" ? (
+          <tabs.Stats />
+        ) : view === "Stake" ? (
+          <tabs.Stake />
         ) : (
-          <Votes />
+          <tabs.Votes />
         )}
       </div>
-
-      {/* <div>
-        <button
-          onClick={() => {
-            hopr
-              .mint({
-                recipient: "0x044c12ca8A14EB9BF67B7325BA7C2Fa7B2e2d1Fd",
-                amount: Web3.utils.toWei("1", "ether")
-              })
-              .then(console.log)
-              .catch(console.error);
-          }}
-        >
-          mint
-        </button>
-        <button
-          onClick={() => {
-            hopr
-              .approve({
-                amount: Web3.utils.toWei("1", "ether")
-              })
-              .then(console.log)
-              .catch(console.error);
-          }}
-        >
-          approve
-        </button>
-        <button
-          onClick={() => {
-            hopr
-              .setHashedSecret()
-              .then(console.log)
-              .catch(console.error);
-          }}
-        >
-          set hashed secret
-        </button>
-        <pre>{JSON.stringify(getSnapshot(hopr), null, 2)}</pre>
-      </div> */}
 
       <style>{`
         * {

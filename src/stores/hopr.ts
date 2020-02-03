@@ -1,6 +1,6 @@
 import { when, reaction } from "mobx";
-import Hopr from "../models/Hopr";
-import web3Store from "./web3";
+import Hopr from "src/models/Hopr";
+import web3Store from "src/stores/web3";
 
 const hopr = Hopr.create();
 

@@ -1,8 +1,9 @@
 import React from "react";
 import { WbSunny, Brightness3 } from "@material-ui/icons";
+import themes from "src/themes";
 
 interface IToggleProps {
-  selected: "light" | "dark";
+  selected: keyof typeof themes;
   onToggle: () => any;
 }
 

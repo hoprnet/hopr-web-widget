@@ -1,34 +1,48 @@
 import React, { useState } from "react";
 import { observer } from "mobx-react";
 import BN from "bn.js";
-import Input from "../Input";
-import Table from "../Table";
-import Button from "../Button";
-import web3 from "../../stores/web3";
-import hopr from "../../stores/hopr";
-import { minifyAddress, channelsToTableData } from "../../utils";
+import Input from "src/components/Input";
+import Table from "src/components/Table";
+import Button from "src/components/Button";
+import StakesModel from "src/models/Stake";
+import web3 from "src/stores/web3";
+import hopr from "src/stores/hopr";
+import { minifyAddress } from "src/utils";
+import TableModel from "src/models/Table";
 
-const tableHeaders = ["From", "To", "Amount", "Opened", "Status"];
+const store = StakesModel.create({
+  from: {
+    value: ""
+  },
+  to: {
+    value: ""
+  },
+  unitAmount: {
+    value: ""
+  }
+});
 
 const Stakes = observer(() => {
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
-  const [unitAmount, setUnitAmount] = useState("");
-  const [error, setError] = useState<string | undefined>(undefined);
-  const stakingDisabled = from === "" || to === "" || unitAmount === "";
+  const [txError, setTxError] = useState<string | undefined>(undefined);
+  const error = [
+    txError,
+    store.from.error,
+    store.to.error,
+    store.unitAmount.error
+  ].find(v => !!v);
 
   const list = Array.from(hopr.channels.values()).filter(channel => {
     return channel.sender === web3.account;
   });
 
-  const tableData = channelsToTableData(list);
+  const table = TableModel(list);
 
   const stake = async () => {
-    setError(undefined);
+    setTxError(undefined);
 
     try {
       const funder = web3.account!;
-      const amount = web3.web3?.utils.toWei(unitAmount, "ether")!;
+      const amount = web3.web3?.utils.toWei(store.unitAmount.value, "ether")!;
 
       // not enough hopr
       if (new BN(amount).gt(new BN(hopr.balance))) {
@@ -39,7 +53,7 @@ const Stakes = observer(() => {
             amount
           });
         } else {
-          return setError("not enough HOPR");
+          return setTxError("not enough HOPR");
         }
       }
 
@@ -57,15 +71,15 @@ const Stakes = observer(() => {
       // create channel
       await hopr.createChannel({
         funder,
-        sender: from,
-        recipient: to,
+        sender: store.from.value,
+        recipient: store.to.value,
         amount
       });
 
-      setError(undefined);
+      setTxError(undefined);
     } catch (error) {
       console.error(error);
-      setError("Unexpected error");
+      setTxError("Unexpected error");
     }
   };
 
@@ -99,27 +113,30 @@ const Stakes = observer(() => {
           type="text"
           label="FROM:"
           undertext="(That's usually your address)"
-          onChange={e => setFrom(e.target.value)}
-          value={from}
+          onChange={e => store.from.set(e.target.value)}
+          value={store.from.value}
+          errored={!store.from.isOk}
         />
         <Input
           title="An ethereum address"
           type="text"
           label="TO:"
           undertext="(Some other relayer's address)"
-          onChange={e => setTo(e.target.value)}
-          value={to}
+          onChange={e => store.to.set(e.target.value)}
+          value={store.to.value}
+          errored={!store.to.isOk}
         />
         <Input
           title="A number of HOPR tokens"
           type="number"
           label="AMOUNT:"
           undertext="(In HOPR tokens)"
-          onChange={e => setUnitAmount(e.target.value)}
-          value={unitAmount}
+          onChange={e => store.unitAmount.set(e.target.value)}
+          value={store.unitAmount.value}
+          errored={!store.unitAmount.isOk}
         />
       </div>
-      <Button disabled={stakingDisabled} onClick={stake}>
+      <Button disabled={store.disabled} onClick={stake}>
         STAKE
       </Button>
       {typeof error !== "undefined" ? error : null}
@@ -127,7 +144,7 @@ const Stakes = observer(() => {
         <h2>You Staked</h2>
       </div>
 
-      <Table headers={tableHeaders} data={tableData} />
+      <Table headers={table.columns} data={table.rows} />
 
       <style>{`
         .align-inputs {

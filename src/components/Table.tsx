@@ -3,14 +3,8 @@ import React from "react";
 export interface ITableProps {
   headers: string[];
   data: {
-    from: {
-      link: string;
-      address: string;
-    };
-    to: {
-      link: string;
-      address: string;
-    };
+    from: string;
+    to: string;
     amount: string;
     date: string;
     status: string;
@@ -32,13 +26,21 @@ const returnTableData = (data: ITableProps["data"]) => {
     return (
       <tr key={row.date}>
         <td>
-          <a href={row.from.link} target="_blank" rel="noopener noreferrer">
-            {row.from.address}
+          <a
+            href={`https://etherscan.io/address/${row.from}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {row.from}
           </a>
         </td>
         <td>
-          <a href={row.to.link} target="_blank" rel="noopener noreferrer">
-            {row.to.address}
+          <a
+            href={`https://etherscan.io/address/${row.to}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {row.to}
           </a>
         </td>
         <td>{row.amount}</td>

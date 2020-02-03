@@ -4,6 +4,7 @@ interface IInputPros extends React.InputHTMLAttributes<any> {
   label: string;
   type?: string;
   undertext?: string;
+  errored?: boolean;
 }
 
 const Input = ({
@@ -12,12 +13,19 @@ const Input = ({
   undertext,
   onChange,
   value,
+  errored,
   ...props
 }: IInputPros) => (
   <>
     <div className="input-and-label">
       {label}
-      <input type={type} onChange={onChange} value={value} {...props} />
+      <input
+        type={type}
+        onChange={onChange}
+        value={value}
+        className={errored ? "input-error" : ""}
+        {...props}
+      />
     </div>
 
     <div className="font-12">{undertext}</div>
@@ -42,6 +50,10 @@ const Input = ({
         input:focus {
           outline: none !important;
           border: 2px solid var(--input-focused);
+        }
+
+        .input-error {
+          border: 2px solid var(--error-color);
         }
     `}</style>
   </>

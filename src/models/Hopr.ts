@@ -1,6 +1,6 @@
 import { types, flow } from "mobx-state-tree";
-import getContract, { Contract } from "../contracts/getContract";
-import web3Store from "../stores/web3";
+import getContract, { Contract } from "src/contracts/getContract";
+import web3Store from "src/stores/web3";
 
 export const Channel = types
   .model("Channel", {

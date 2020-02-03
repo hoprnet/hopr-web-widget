@@ -1,13 +1,11 @@
 import React from "react";
 import { observer } from "mobx-react";
-import hopr from "../../stores/hopr";
-import Table from "../Table";
-import { channelsToTableData } from "../../utils";
-
-const tableHeaders = ["From", "To", "Amount", "Opened", "Status"];
+import TableModel from "src/models/Table";
+import hopr from "src/stores/hopr";
+import Table from "src/components/Table";
 
 const Stats = observer(() => {
-  const tableData = channelsToTableData(Array.from(hopr.channels.values()));
+  const table = TableModel(Array.from(hopr.channels.values()));
 
   return (
     <div id="stats-container" className="content-container">
@@ -27,7 +25,7 @@ const Stats = observer(() => {
           pending)
         </div>
       </div>
-      <Table headers={tableHeaders} data={tableData} />
+      <Table headers={table.columns} data={table.rows} />
 
       <style>{`
         .chart {

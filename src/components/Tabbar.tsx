@@ -1,7 +1,8 @@
 import React from "react";
+import tabs from "src/components/tabs";
 
 interface ITabbarProps {
-  selected: "stats" | "stake" | "votes";
+  selected: keyof typeof tabs;
   onSelect: (view: ITabbarProps["selected"]) => any;
 }
 
@@ -10,22 +11,22 @@ const Tabbar = ({ selected, onSelect }: ITabbarProps) => {
     <div className="tab-bar">
       <div
         id="stats-tab"
-        className={`tab ${selected === "stats" ? "selected" : ""}`}
-        onClick={() => onSelect("stats")}
+        className={`tab ${selected === "Stats" ? "selected" : ""}`}
+        onClick={() => onSelect("Stats")}
       >
         Stats
       </div>
       <div
         id="stake-tab"
-        className={`tab ${selected === "stake" ? "selected" : ""}`}
-        onClick={() => onSelect("stake")}
+        className={`tab ${selected === "Stake" ? "selected" : ""}`}
+        onClick={() => onSelect("Stake")}
       >
         Stake
       </div>
       <div
         id="votes-tab"
-        className={`tab ${selected === "votes" ? "selected" : ""}`}
-        onClick={() => onSelect("votes")}
+        className={`tab ${selected === "Votes" ? "selected" : ""}`}
+        onClick={() => onSelect("Votes")}
       >
         Vote
       </div>
