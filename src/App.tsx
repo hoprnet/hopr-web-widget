@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import tabs from "src/components/tabs";
 import Toggle from "src/components/Toggle";
-import Tabbar from "src/components/Tabbar";
+import TabBar from "src/components/TabBar";
 import themes from "src/themes";
 
 const App = () => {
@@ -11,7 +11,7 @@ const App = () => {
   return (
     <div className="App" style={theme === "light" ? themes.light : themes.dark}>
       <div className="background">
-        <Tabbar selected={view} onSelect={newView => setView(newView)} />
+        <TabBar selected={view} onSelect={newView => setView(newView)} />
         <Toggle
           selected={theme}
           onToggle={() => setTheme(theme === "light" ? "dark" : "light")}

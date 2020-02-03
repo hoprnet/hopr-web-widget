@@ -42,7 +42,7 @@ const Stakes = observer(() => {
 
     try {
       const funder = web3.account!;
-      const amount = web3.web3?.utils.toWei(store.unitAmount.value, "ether")!;
+      const amount = web3.web3!.utils.toWei(store.unitAmount.value, "ether")!;
 
       // not enough hopr
       if (new BN(amount).gt(new BN(hopr.balance))) {

@@ -16,7 +16,7 @@ export const Channel = types
   })
   .views(self => ({
     get depositInHopr() {
-      return web3Store.web3?.utils.fromWei(self.deposit, "ether")!;
+      return web3Store.web3!.utils.fromWei(self.deposit, "ether")!;
     },
 
     get status(): "OPEN" | "PENDING" | "CLOSED" {
@@ -40,7 +40,7 @@ const Hopr = types
   })
   .views(self => ({
     get balanceInHopr() {
-      return web3Store.web3?.utils.fromWei(self.balance, "ether")!;
+      return web3Store.web3!.utils.fromWei(self.balance, "ether")!;
     }
   }))
   .volatile<{
@@ -125,7 +125,7 @@ const Hopr = types
       const channel = self.channels.get(id);
       if (!channel) return;
 
-      const toBN = web3Store.web3?.utils.toBN!;
+      const toBN = web3Store.web3!.utils.toBN!;
 
       channel.deposit = toBN(channel.deposit!)
         .sub(toBN(recipientAmount))
@@ -156,7 +156,7 @@ const Hopr = types
       setHashedSecret: flow(function* createChannel() {
         yield self
           .hoprChannels!.methods.setHashedSecret(
-            web3Store.web3?.utils.keccak256(web3Store.web3?.utils.randomHex(32))
+            web3Store.web3!.utils.keccak256(web3Store.web3!.utils.randomHex(32))
           )
           .send({
             from: web3Store.account
@@ -245,7 +245,7 @@ const Hopr = types
           })
           .on("data", async (data: any) => {
             if (data.event === "OpenedChannel") {
-              const block = await web3Store.web3?.eth.getBlock(
+              const block = await web3Store.web3!.eth.getBlock(
                 data.blockNumber
               )!;
 

@@ -1,12 +1,12 @@
 import React from "react";
 import tabs from "src/components/tabs";
 
-interface ITabbarProps {
+interface ITabBarProps {
   selected: keyof typeof tabs;
-  onSelect: (view: ITabbarProps["selected"]) => any;
+  onSelect: (view: ITabBarProps["selected"]) => any;
 }
 
-const Tabbar = ({ selected, onSelect }: ITabbarProps) => {
+const TabBar = ({ selected, onSelect }: ITabBarProps) => {
   return (
     <div className="tab-bar">
       <div
@@ -72,4 +72,4 @@ const Tabbar = ({ selected, onSelect }: ITabbarProps) => {
   );
 };
 
-export default Tabbar;
+export default TabBar;
