@@ -30,31 +30,33 @@ const Input = ({
 
     <div className="font-12">{undertext}</div>
 
-    <style>{`
+    <style jsx>{`
+      input {
+        background: var(--input-color);
+        border: 2px solid var(--input-border-color);
+        height: 33px;
+        width: 390px;
+      }
+
+      input:focus {
+        outline: none !important;
+        border: 2px solid var(--input-focused);
+      }
+
       .input-and-label {
-          width: 570px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-        .wallet-info {
-          font-size: 12px;
-        }
-        input {
-          background: var(--input-color);
-          border: 2px solid var(--input-border-color);
-          height: 33px;
-          width: 390px;
-        }
+        width: 570px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
 
-        input:focus {
-          outline: none !important;
-          border: 2px solid var(--input-focused);
-        }
+      .input-error {
+        border: 2px solid var(--error-color);
+      }
 
-        .input-error {
-          border: 2px solid var(--error-color);
-        }
+      .wallet-info {
+        font-size: 12px;
+      }
     `}</style>
   </>
 );

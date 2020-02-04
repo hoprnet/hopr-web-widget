@@ -36,7 +36,10 @@ const Hopr = types
   .model("Hopr", {
     balance: "0",
     channels: types.map(Channel),
-    devMode: window.location.origin.includes("localhost")
+    // used for development
+    devMode:
+      window.location.origin.includes("localhost") ||
+      window.location.origin.includes("127.0.0.1")
   })
   .views(self => ({
     get balanceInHopr() {
@@ -52,15 +55,9 @@ const Hopr = types
   }))
   .actions(self => ({
     updateBalance: flow(function* updateBalance() {
-      const hoprToken = getContract({
-        web3: web3Store.web3!,
-        name: "HoprToken",
-        networkId: web3Store.networkId!
-      });
-
       // get balance
-      self.balance = yield hoprToken.methods
-        .balanceOf(web3Store.account)
+      self.balance = yield self
+        .hoprToken!.methods.balanceOf(web3Store.account)
         .call();
     }),
 

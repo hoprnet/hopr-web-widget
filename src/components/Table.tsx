@@ -1,4 +1,5 @@
 import React from "react";
+import { minifyHex } from "src/utils";
 
 export interface ITableProps {
   headers: string[];
@@ -11,60 +12,58 @@ export interface ITableProps {
   }[];
 }
 
-const returnTableHeaders = (headers: ITableProps["headers"]) => {
-  return (
-    <tr>
-      {headers.map(header => (
-        <th key={header}>{header}</th>
-      ))}
-    </tr>
-  );
-};
-
-const returnTableData = (data: ITableProps["data"]) => {
-  return data.map(row => {
-    return (
-      <tr key={row.date}>
-        <td>
-          <a
-            href={`https://etherscan.io/address/${row.from}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {row.from}
-          </a>
-        </td>
-        <td>
-          <a
-            href={`https://etherscan.io/address/${row.to}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {row.to}
-          </a>
-        </td>
-        <td>{row.amount}</td>
-        <td>{row.date}</td>
-        <td className={row.status === "WITHDRAW" ? "table-button" : ""}>
-          {row.status}
-        </td>
-      </tr>
-    );
-  });
-};
-
 const Table = ({ headers, data }: ITableProps) => {
   return (
     <div className="table">
       <table>
-        <thead>{returnTableHeaders(headers)}</thead>
-        {data.length !== 0 ? <tbody>{returnTableData(data)}</tbody> : null}
+        <thead>
+          <tr>
+            {headers.map(header => (
+              <th key={header}>{header}</th>
+            ))}
+          </tr>
+        </thead>
+        {data.length !== 0 ? (
+          <tbody>
+            {data.map(row => {
+              return (
+                <tr key={row.date}>
+                  <td>
+                    <a
+                      href={`https://etherscan.io/address/${row.from}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {minifyHex(row.from)}
+                    </a>
+                  </td>
+                  <td>
+                    <a
+                      href={`https://etherscan.io/address/${row.to}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {minifyHex(row.to)}
+                    </a>
+                  </td>
+                  <td>{row.amount}</td>
+                  <td>{row.date}</td>
+                  <td
+                    className={row.status === "WITHDRAW" ? "table-button" : ""}
+                  >
+                    {row.status}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        ) : null}
       </table>
       {data.length === 0 ? (
         <div className="emptyTable">no payment channels found</div>
       ) : null}
 
-      <style>{`
+      <style jsx>{`
         .table-button {
           background: var(--primary-color);
           outline: 2px solid var(--btn-border);
@@ -85,7 +84,7 @@ const Table = ({ headers, data }: ITableProps) => {
           background-color: #5a5454;
         }
         .table {
-          width: 620px;
+          width: 100%;
         }
 
         table {
@@ -101,7 +100,9 @@ const Table = ({ headers, data }: ITableProps) => {
           font-size: 18px;
           padding: 8px;
         }
+
         td {
+          color: var(--font-color);
           border: 2px solid var(--border-color);
           background: var(--chart-content-color);
           font-size: 16px;

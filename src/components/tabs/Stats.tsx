@@ -8,46 +8,72 @@ const Stats = observer(() => {
   const table = TableModel(Array.from(hopr.channels.values()));
 
   return (
-    <div id="stats-container" className="content-container">
-      <div className="title">
-        <h2 className="h2-alt-margin">HOPR Staking Statistics</h2>
-        <div className="font-12 thin">
-          The chart below shows the amount of HOPR tokens staked by relay nodes
-          (solid line) and the number of open payment channels
+    <div className="container">
+      <div className="chart-container">
+        <div className="title">
+          <h2>HOPR Staking Statistics</h2>
+          <div className="thin">
+            The chart below shows the amount of HOPR tokens staked by relay
+            nodes (solid line) and the number of open payment channels
+          </div>
         </div>
+        <div className="chart">[coming soon...]</div>
       </div>
 
-      <div className="chart font-12">[coming soon...]</div>
-      <div className="title">
-        <h2 className="h2-alt-margin">List of HOPR Payment Channels</h2>
-        <div className="font-12 thin">
-          The table below shows all HOPR payment channels (past, present and
-          pending)
+      <div className="table-container">
+        <div className="title">
+          <h2>List of HOPR Payment Channels</h2>
+          <div className="thin">
+            The table below shows all HOPR payment channels (past, present and
+            pending)
+          </div>
         </div>
+        <Table headers={table.columns} data={table.rows} />
       </div>
-      <Table headers={table.columns} data={table.rows} />
 
-      <style>{`
-        .chart {
-          background: var(--bg-color);
-          border: 2px solid var(--secondary-color);
-          width: 570px;
-          height: 250px;
+      <style jsx>{`
+        .container {
           display: flex;
+          flex-direction: column;
           align-items: center;
-          justify-content: center;
+          width: 100%;
         }
-        .thin{
-          width: 570px;
+
+        .chart-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          width: 90%;
         }
+
+        .table-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          width: 100%;
+        }
+
         .title {
           text-align: center;
-          width: 570px;
           margin-bottom: 5px;
           justify-content: center;
           align-items: center;
           display: flex;
           flex-direction: column;
+        }
+
+        .thin {
+          width: 570px;
+        }
+
+        .chart {
+          background: var(--bg-color);
+          border: 2px solid var(--secondary-color);
+          width: 100%;
+          height: 250px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
       `}</style>
     </div>

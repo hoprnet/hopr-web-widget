@@ -20,7 +20,7 @@ const Button = ({
     >
       {children}
 
-      <style>{`
+      <style jsx>{`
         .button {
           background: var(--primary-color);
           border: 2px solid var(--btn-border);
@@ -33,11 +33,6 @@ const Button = ({
           cursor: pointer;
         }
 
-        .button-disabled {
-          opacity: 75%;
-          cursor: not-allowed;
-        }
-
         .button:active {
           border-color: var(--font-color);
           background-color: #5a5454;
@@ -46,6 +41,11 @@ const Button = ({
         .button:hover {
           opacity: 80%;
           border-color: var(--font-color);
+        }
+
+        .button-disabled {
+          opacity: 75%;
+          cursor: not-allowed;
         }
       `}</style>
     </div>

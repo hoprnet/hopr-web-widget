@@ -1,90 +1,51 @@
 import React, { useState } from "react";
 import tabs from "src/components/tabs";
-import Toggle from "src/components/Toggle";
 import TabBar from "src/components/TabBar";
-import themes from "src/themes";
+import { themes, constants } from "src/styles";
 
 const App = () => {
+  const { light, dark } = themes;
   const [theme, setTheme] = useState<keyof typeof themes>("light");
   const [view, setView] = useState<keyof typeof tabs>("Stats");
 
+  const themeClassName =
+    theme === "light" ? "global-light-theme" : "global-dark-theme";
+
   return (
-    <div className="App" style={theme === "light" ? themes.light : themes.dark}>
-      <div className="background">
-        <TabBar selected={view} onSelect={newView => setView(newView)} />
-        <Toggle
-          selected={theme}
-          onToggle={() => setTheme(theme === "light" ? "dark" : "light")}
-        />
+    <div className={`container global-constants ${themeClassName}`}>
+      <TabBar
+        selectedView={view}
+        onSelectView={newView => setView(newView)}
+        selectedTheme={theme}
+        onToggleTheme={() => setTheme(theme === "light" ? "dark" : "light")}
+      />
 
-        {view === "Stats" ? (
-          <tabs.Stats />
-        ) : view === "Stake" ? (
-          <tabs.Stake />
-        ) : (
-          <tabs.Votes />
-        )}
-      </div>
+      {view === "Stats" ? (
+        <tabs.Stats />
+      ) : view === "Stake" ? (
+        <tabs.Stake />
+      ) : (
+        <tabs.Votes />
+      )}
 
-      <style>{`
-        * {
-          font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
-          color: var(--font-color);
-        }
+      {/* initialize themes */}
+      <style jsx global>
+        {constants}
+      </style>
+      <style jsx>{light}</style>
+      <style jsx>{dark}</style>
 
-        body {
-          font-style: normal;
-          font-weight: bold;
-          font-size: 18px;
-        }
-
-        h2 {
-          font-size: 22px;
-          text-align: center;
-        }
-
-        a {
-          text-decoration: none;
-        }
-
-        a:hover {
-          text-decoration: underline;
-        }
-
-        .font-12 {
-          font-size: 12px;
-          font-weight: normal;
-        }
-
-        .background {
+      <style jsx>{`
+        .container {
+          display: flex;
+          min-height: 700px;
+          min-width: 620px;
+          justify-content: flex-start;
+          flex-direction: column;
+          align-items: center;
           background: var(--bg-color);
-          height: 700px;
-          width: 620px;
           border: 2px solid var(--secondary-color);
-          align-items: center;
-          display: flex;
-          justify-content: space-between;
-          flex-direction: column;
-        }
-
-        .content-container {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          flex-direction: column;
-          width: 620px;
-          height: 630px;
-        }
-
-        i {
-          font-size: 27px;
-          color: white;
-          margin: 2px;
-          margin-top: 4px;
-          border: 1px transparent solid;
-        }
-        .h2-alt-margin {
-          margin-bottom: 5px;
+          color: var(--font-color);
         }
       `}</style>
     </div>

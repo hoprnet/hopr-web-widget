@@ -1,57 +1,51 @@
 import React from "react";
+// TODO: investigate: tree shaking should work here
 import { WbSunny, Brightness3 } from "@material-ui/icons";
-import themes from "src/themes";
+import { themes } from "src/styles/themes";
 
-interface IToggleProps {
+export interface IToggleProps {
   selected: keyof typeof themes;
   onToggle: () => any;
 }
 
 const Toggle = ({ selected, onToggle }: IToggleProps) => {
   return (
-    <div className="toggle-container">
+    <div className="container">
       <div className="toggle" onClick={onToggle}>
         <div className="square"></div>
         <div className="icon">
           {selected === "light" ? <WbSunny /> : <Brightness3 />}
         </div>
       </div>
-      <style>{`
-        .toggle {
-          background: var(--secondary-color);
+
+      <style jsx>{`
+        .container {
           display: flex;
-          cursor: pointer;
+        }
+
+        .toggle {
+          display: flex;
           flex-direction: var(--toggle-flex-direction);
+          background: var(--secondary-color);
+          cursor: pointer;
         }
 
         .square {
-          background: var(--primary-color);
+          height: 40px;
+          width: 40px;
           border: 2px solid var(--secondary-color);
-          height: 33px;
-          width: 33px;
+          background: var(--primary-color);
         }
 
         .icon {
-          height: 33px;
-          width: 33px;
           display: flex;
-          color: var(--alt-font-color);
+          height: 40px;
+          width: 40px;
           justify-content: center;
           align-items: center;
           padding: 1px;
-          font-size: 33px;
-        }
-
-        .icon > * {
-          fill: var(--alt-font-color);
-        }
-
-        .toggle-container {
-          width: 570px;
-          justify-content: flex-end;
-          display: flex;
-          position: absolute;
-          top: 82px;
+          font-size: 40px;
+          color: var(--alt-font-color) !important;
         }
       `}</style>
     </div>

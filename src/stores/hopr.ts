@@ -12,7 +12,7 @@ when(
   }
 );
 
-// update balance when account changes
+// update user's balance when account changes
 let previousAccount = web3Store.account;
 reaction(
   () => {

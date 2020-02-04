@@ -1,5 +1,4 @@
 import React from "react";
-// import Button from "src/components/Button";
 
 const Votes = () => {
   return (
@@ -8,49 +7,8 @@ const Votes = () => {
         <h2>Voting for HOPR DAO</h2>
       </div>
       <div className="content font-12">[coming soon...]</div>
-      {/* 
-    <div className="title">
-      <h2>Vote Title</h2>
-      <div className="font-12">Created by 0ex13..A915</div>
-    </div>
-    <div className="description">
-      <h2>Description</h2>
-      <div className="font-12">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam sed
-        metus sit amet arcu posuere consequat. Nullam sed metus id ex luctus
-        dapibus non maximus felis. Vestibulum facilisis dui id fringilla
-        pulvinar. Nullam molestie sed dui nec accumsan. Sed non justo
-        malesuada, mollis augue et, tempor mauris. Aenean rhoncus velit
-        libero, a commodo elit elementum a.
-      </div>
-    </div>
-    <div className="current-votes">
-      <h2>Current Votes</h2>
-      <div className="votes-bar">
-        <div className="green-bar"></div>
-        <div className="white-bar"></div>
-        <div className="red-bar"></div>
-      </div>
-    </div>
 
-    <div className="voting-info">
-      <div className="vote-results font-12">
-        <div className="circle-green"></div>
-        YES <span className="vote-percentage">50%</span>
-        <span className="hopr-amount">10 HOPR</span>
-      </div>
-      <div className="vote-results font-12">
-        <div className="circle-red"></div>
-        NO <span className="vote-percentage">50%</span>
-        <span className="hopr-amount">10 HOPR</span>
-      </div>
-    </div>
-
-      <div className="align-buttons">
-        <Button style={{border: "2px solid #33ff00"}}>YES</Button>
-        <Button style={{border: "2px solid #ff0000"}}>NO</Button>
-    </div> */}
-      <style>{`
+      <style jsx>{`
         .title {
           text-align: center;
           width: 570px;
@@ -162,3 +120,48 @@ const Votes = () => {
 };
 
 export default Votes;
+
+/*
+  // Votes UI
+    <div className="title">
+      <h2>Vote Title</h2>
+      <div className="font-12">Created by 0ex13..A915</div>
+    </div>
+    <div className="description">
+      <h2>Description</h2>
+      <div className="font-12">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam sed
+        metus sit amet arcu posuere consequat. Nullam sed metus id ex luctus
+        dapibus non maximus felis. Vestibulum facilisis dui id fringilla
+        pulvinar. Nullam molestie sed dui nec accumsan. Sed non justo
+        malesuada, mollis augue et, tempor mauris. Aenean rhoncus velit
+        libero, a commodo elit elementum a.
+      </div>
+    </div>
+    <div className="current-votes">
+      <h2>Current Votes</h2>
+      <div className="votes-bar">
+        <div className="green-bar"></div>
+        <div className="white-bar"></div>
+        <div className="red-bar"></div>
+      </div>
+    </div>
+
+    <div className="voting-info">
+      <div className="vote-results font-12">
+        <div className="circle-green"></div>
+        YES <span className="vote-percentage">50%</span>
+        <span className="hopr-amount">10 HOPR</span>
+      </div>
+      <div className="vote-results font-12">
+        <div className="circle-red"></div>
+        NO <span className="vote-percentage">50%</span>
+        <span className="hopr-amount">10 HOPR</span>
+      </div>
+    </div>
+
+      <div className="align-buttons">
+        <Button style={{border: "2px solid #33ff00"}}>YES</Button>
+        <Button style={{border: "2px solid #ff0000"}}>NO</Button>
+    </div>
+*/

@@ -5,9 +5,9 @@ import Input from "src/components/Input";
 import Table from "src/components/Table";
 import Button from "src/components/Button";
 import StakesModel from "src/models/Stake";
+import { AddressLink, BalanceLink } from "src/components/Link";
 import web3 from "src/stores/web3";
 import hopr from "src/stores/hopr";
-import { minifyAddress } from "src/utils";
 import TableModel from "src/models/Table";
 
 const store = StakesModel.create({
@@ -84,81 +84,116 @@ const Stakes = observer(() => {
   };
 
   return (
-    <div id="stake-container" className="content-container">
+    <div className="container">
       <div className="top">
         <h2>Open New Channel</h2>
 
         <div className="wallet-info">
           Your Wallet Address:{" "}
-          {web3.account ? (
-            <a
-              href={`https://etherscan.io/address/${web3.account}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {minifyAddress(web3.account)}
-            </a>
-          ) : (
-            "?"
-          )}
+          {web3.account ? <AddressLink address={web3.account} /> : "?"}
         </div>
         <div className="wallet-info">
-          Balance: {web3.account ? hopr.balanceInHopr : "?"} HOPR
+          Balance:{" "}
+          {web3.account ? (
+            <BalanceLink
+              account={web3.account}
+              token={hopr.hoprToken!.options.address}
+            >
+              {hopr.balanceInHopr}
+            </BalanceLink>
+          ) : (
+            "?"
+          )}{" "}
+          HOPR
         </div>
       </div>
 
-      <div className="align-inputs">
-        <Input
-          title="An ethereum address"
-          type="text"
-          label="FROM:"
-          undertext="(That's usually your address)"
-          onChange={e => store.from.set(e.target.value)}
-          value={store.from.value}
-          errored={!store.from.isOk}
-        />
-        <Input
-          title="An ethereum address"
-          type="text"
-          label="TO:"
-          undertext="(Some other relayer's address)"
-          onChange={e => store.to.set(e.target.value)}
-          value={store.to.value}
-          errored={!store.to.isOk}
-        />
-        <Input
-          title="A number of HOPR tokens"
-          type="number"
-          label="AMOUNT:"
-          undertext="(In HOPR tokens)"
-          onChange={e => store.unitAmount.set(e.target.value)}
-          value={store.unitAmount.value}
-          errored={!store.unitAmount.isOk}
-        />
-      </div>
-      <Button disabled={store.disabled} onClick={stake}>
-        STAKE
-      </Button>
-      {typeof error !== "undefined" ? error : null}
-      <div className="title">
-        <h2>You Staked</h2>
+      <div className="form">
+        <div className="align-inputs">
+          <Input
+            title="An ethereum address"
+            type="text"
+            label="FROM:"
+            undertext="(That's usually your address)"
+            onChange={e => store.from.set(e.target.value)}
+            value={store.from.value}
+            errored={!store.from.isOk}
+          />
+          <Input
+            title="An ethereum address"
+            type="text"
+            label="TO:"
+            undertext="(Some other relayer's address)"
+            onChange={e => store.to.set(e.target.value)}
+            value={store.to.value}
+            errored={!store.to.isOk}
+          />
+          <Input
+            title="A number of HOPR tokens"
+            type="number"
+            label="AMOUNT:"
+            undertext="(In HOPR tokens)"
+            onChange={e => store.unitAmount.set(e.target.value)}
+            value={store.unitAmount.value}
+            errored={!store.unitAmount.isOk}
+          />
+        </div>
+        <Button disabled={store.disabled} onClick={stake}>
+          STAKE
+        </Button>
+        {typeof error !== "undefined" ? error : null}
       </div>
 
-      <Table headers={table.columns} data={table.rows} />
+      <div className="table-container">
+        <div className="title">
+          <h2>You Staked</h2>
+        </div>
 
-      <style>{`
+        <Table headers={table.columns} data={table.rows} />
+      </div>
+
+      <style jsx>{`
+        .container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          width: 100%;
+          color: var(--font-color);
+        }
+
+        .top {
+          width: 90%;
+          text-align: center;
+        }
+
+        .form {
+          display: flex;
+          align-items: center;
+          flex-direction: column;
+          margin: 50px 0 0 0;
+          width: 90%;
+        }
+
+        .table-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          width: 100%;
+        }
+
         .align-inputs {
-          height: 150px;
           display: flex;
           flex-direction: column;
           justify-content: space-between;
         }
+
         .input-and-label {
           width: 570px;
           display: flex;
           justify-content: space-between;
           align-items: center;
         }
+
         .wallet-info {
           font-size: 12px;
         }
@@ -172,12 +207,6 @@ const Stakes = observer(() => {
         input:focus {
           outline: none !important;
           border: 2px solid var(--input-focused);
-        }
-
-        .top {
-          text-align: center;
-          margin-bottom: 15px;
-          width: 570px;
         }
 
         .title {
