@@ -28,7 +28,7 @@ const Stats = observer(() => {
             pending)
           </div>
         </div>
-        <Table headers={table.columns} data={table.rows} />
+        <Table columns={table.columns} rows={table.rows} />
       </div>
 
       <style jsx>{`

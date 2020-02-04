@@ -2,18 +2,21 @@ import { Instance } from "mobx-state-tree";
 import { toCustomDateFormat } from "src/utils";
 import { Channel } from "src/models/Hopr";
 
-type IRow = {
+export type IColumn = string;
+
+export type IRow = {
   from: string;
   to: string;
   amount: string;
-  date: string;
+  createdAt: string;
   status: string;
+  channel: Instance<typeof Channel>;
 };
 
-type ITable = (
+export type ITable = (
   channels: Instance<typeof Channel>[]
 ) => {
-  columns: string[];
+  columns: IColumn[];
   rows: IRow[];
 };
 
@@ -23,8 +26,9 @@ const Table: ITable = channels => ({
     from: channel.sender,
     to: channel.recipient,
     amount: channel.depositInHopr,
-    date: toCustomDateFormat(channel.createdAt),
-    status: channel.status
+    createdAt: toCustomDateFormat(channel.createdAt),
+    status: channel.status,
+    channel
   }))
 });
 
