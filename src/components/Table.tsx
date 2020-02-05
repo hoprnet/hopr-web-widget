@@ -30,7 +30,7 @@ const Table = observer(
                 // const closureTime = new BN(row.channel.closureTime);
 
                 return (
-                  <tr key={row.createdAt}>
+                  <tr key={row.channel.id}>
                     <td>
                       <a
                         href={`https://etherscan.io/address/${row.from}`}

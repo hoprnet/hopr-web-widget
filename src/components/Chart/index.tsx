@@ -1,106 +1,29 @@
+// @ts-nocheck
 import React from "react";
-import { timeFormat, bisector } from "d3";
-import { Instance } from "mobx-state-tree";
-import { Channel } from "../models/Hopr";
+import { reaction } from "mobx";
+import * as d3 from "d3";
+import Web3 from "web3";
+import { events } from "src/models/Hopr";
+import "./styles.css";
 
-interface IChartProps {
-  channels: Instance<typeof Channel>[];
-}
+var svg,
+  timeScale,
+  amountScale,
+  countScale,
+  width,
+  height,
+  margin,
+  chartData,
+  tooltipDimensions,
+  focus;
+var xAxis, yAxisAmount, yAxisCount, amountLine, countLine;
+var dateFormat = d3.timeFormat("%b %d");
+var fullMonthDateFormat = d3.timeFormat("%b %d, %Y");
+var bisectDate = d3.bisector(function(d) {
+  return d.date;
+}).left;
 
-interface IChartState {
-  timeScale?: number;
-  amountScale?: number;
-  countScale?: number;
-  width?: number;
-  height?: number;
-  margin?: number;
-  xAxis?: number;
-  yAxisAmount?: number;
-  yAxisCount?: number;
-  amountLine?: number;
-  countLine?: number;
-  focus?: boolean;
-  dateFormat: ReturnType<typeof timeFormat>;
-  fullMonthDateFormat: ReturnType<typeof timeFormat>;
-  bisectDate: number;
-}
-
-const state: IChartState = {
-  dateFormat: timeFormat("%b %d"),
-  fullMonthDateFormat: timeFormat("%b %d, %Y"),
-  bisectDate: bisector<any, number>(d => {
-    return d.date;
-  }).left
-};
-
-class Chart extends React.Component<IChartProps> {}
-
-// const Chart = ({ channels }: IChartProps) => {};
-
-export default Chart;
-
-window.addEventListener("resize", function() {
-  initChart();
-  renderRecords();
-});
-
-function parseAmount(amount) {
-  return amount / 10000;
-}
-
-function whatchChannel(event, eventType) {
-  var channelEvent = event({}, { fromBlock: 0, toBlock: "latest" });
-  channelEvent.watch(function(error, result) {
-    var amount = parseAmount(result.args.amount.c[0]);
-    var time = result.args.time.c[0];
-    var eventRecord = { type: eventType, amount: amount, time: time };
-    channelEventRecords.push(eventRecord);
-    renderRecords();
-  });
-}
-
-function renderRecords() {
-  var orderedRecords = channelEventRecords.sort(function(a, b) {
-    return a.time - b.time;
-  });
-  var aggregatedRecords = aggregateRecords(orderedRecords);
-  updateChart(aggregatedRecords);
-  setOverlayTooltip();
-}
-
-function aggregateRecords(records) {
-  var channelAmmountBalance = 0;
-  var channelStatusCount = 0;
-  var aggregatedRecords = [];
-
-  for (var i = 0; i < records.length; i++) {
-    var record = records[i];
-    var recordEventType = record.type;
-    var recordEventAmount = record.amount;
-
-    if (recordEventType === OPEN_CHANNEL_EVENT) {
-      channelStatusCount += 1;
-      channelAmmountBalance += recordEventAmount;
-    } else {
-      channelStatusCount -= 1;
-      channelAmmountBalance -= recordEventAmount;
-    }
-
-    var recordDate = new Date(record.time * 1000);
-
-    aggregatedRecords.push(
-      Object.assign({}, records[i], {
-        aggCount: channelStatusCount,
-        aggAmount: channelAmmountBalance,
-        date: recordDate
-      })
-    );
-  }
-
-  return aggregatedRecords;
-}
-
-function initChart() {
+const initChart = () => {
   margin = { top: 30, right: 70, bottom: 30, left: 60 };
   width =
     document.getElementById("chart-container").offsetWidth -
@@ -140,6 +63,10 @@ function initChart() {
     .y(function(d) {
       return countScale(d.aggCount);
     });
+};
+
+function parseAmount(amount) {
+  return amount / 10000;
 }
 
 function updateChart(data) {
@@ -347,3 +274,117 @@ function zeroFill(number) {
     return String(number);
   }
 }
+
+function aggregateRecords(records) {
+  var channelAmmountBalance = 0;
+  var channelStatusCount = 0;
+  var aggregatedRecords = [];
+
+  for (var i = 0; i < records.length; i++) {
+    var record = records[i];
+    var recordEventType = record.type;
+    var recordEventAmount = record.amount;
+
+    if (recordEventType === "OpenedChannel") {
+      channelStatusCount += 1;
+      channelAmmountBalance += recordEventAmount;
+    } else {
+      channelStatusCount -= 1;
+      channelAmmountBalance -= recordEventAmount;
+    }
+
+    console.log(record.time);
+    var recordDate = new Date(record.time);
+
+    console.log({
+      aggCount: channelStatusCount,
+      aggAmount: channelAmmountBalance,
+      date: recordDate
+    });
+
+    aggregatedRecords.push(
+      Object.assign({}, records[i], {
+        aggCount: channelStatusCount,
+        aggAmount: channelAmmountBalance,
+        date: recordDate
+      })
+    );
+  }
+
+  return aggregatedRecords;
+}
+
+function renderRecords(hoprEvents) {
+  const events = Array.from(hoprEvents)
+    .filter(event => {
+      return (
+        event.data.event === "OpenedChannel" ||
+        event.data.event === "ClosedChannel"
+      );
+    })
+    .map(event => {
+      const returnValues = event.data.returnValues;
+
+      const amount =
+        event.data.event === "OpenedChannel"
+          ? parseAmount(returnValues.deposit)
+          : parseAmount(returnValues.senderAmount) +
+            parseAmount(returnValues.receiverAmount);
+      const time = event.createdAt;
+
+      return {
+        type: event.data.event,
+        amount: Web3.utils.fromWei(String(amount), "ether"),
+        time: time
+      };
+    });
+
+  console.log(events);
+
+  var orderedRecords = events.sort(function(a, b) {
+    return a.createdAt - b.createdAt;
+  });
+
+  var aggregatedRecords = aggregateRecords(orderedRecords);
+  console.log(aggregatedRecords);
+
+  updateChart(aggregatedRecords);
+  setOverlayTooltip();
+}
+
+class Chart extends React.Component {
+  svgRef?: any;
+
+  constructor(props: any) {
+    super(props);
+
+    this.svgRef = React.createRef();
+  }
+
+  public componentDidMount() {
+    svg = this.svgRef!.current;
+    initChart();
+
+    reaction(
+      () => events.length > 3,
+      () => renderRecords(events)
+    );
+  }
+
+  public render() {
+    return (
+      <div id="chart-container">
+        <svg ref={this.svgRef} />
+
+        <style jsx>{`
+          #chart-container {
+            width: 100%;
+            height: 100%;
+          }
+        `}</style>
+      </div>
+    );
+  }
+}
+
+export default Chart;

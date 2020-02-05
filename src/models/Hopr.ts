@@ -1,3 +1,4 @@
+import { observable } from "mobx";
 import { types, flow } from "mobx-state-tree";
 import getContract, { Contract } from "src/contracts/getContract";
 import web3Store from "src/stores/web3";
@@ -31,6 +32,8 @@ export const Channel = types
       return "CLOSED";
     }
   }));
+
+export const events = observable<any>([]);
 
 const Hopr = types
   .model("Hopr", {
@@ -241,14 +244,19 @@ const Hopr = types
             toBlock: "latest"
           })
           .on("data", async (data: any) => {
-            if (data.event === "OpenedChannel") {
-              const block = await web3Store.web3!.eth.getBlock(
-                data.blockNumber
-              )!;
+            const block = await web3Store.web3!.eth.getBlock(data.blockNumber)!;
+            const createdAt = Number(block.timestamp) * 1e3;
 
+            events.push({
+              data,
+              createdAt
+            });
+            console.log("pushed");
+
+            if (data.event === "OpenedChannel") {
               return self.onOpenedChannel({
                 ...data.returnValues,
-                createdAt: Number(block.timestamp) * 1e3
+                createdAt
               });
             } else if (data.event === "ClosedChannel") {
               return self.onClosedChannel(data.returnValues);

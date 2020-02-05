@@ -3,6 +3,7 @@ import { observer } from "mobx-react";
 import TableModel from "src/models/Table";
 import hopr from "src/stores/hopr";
 import Table from "src/components/Table";
+import Chart from "src/components/Chart";
 
 const Stats = observer(() => {
   const table = TableModel(Array.from(hopr.channels.values()));
@@ -17,7 +18,10 @@ const Stats = observer(() => {
             nodes (solid line) and the number of open payment channels
           </div>
         </div>
-        <div className="chart">[coming soon...]</div>
+        {/* <div className="chart">[coming soon...]</div> */}
+        <div className="chart">
+          <Chart />
+        </div>
       </div>
 
       <div className="table-container">
