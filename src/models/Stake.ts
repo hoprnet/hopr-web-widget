@@ -1,33 +1,48 @@
 import { types } from "mobx-state-tree";
 import Web3 from "web3";
-import Input, { IInputProps } from "src/models/Input";
-
-const validateAddress: IInputProps<any>["validation"] = value => {
-  if (typeof value === "undefined") return undefined;
-  if (Web3.utils.isAddress(value)) return undefined;
-
-  return "invalid address";
-};
+import Input from "src/models/Input";
+import Transaction from "src/models/Transaction";
 
 const Stake = types
   .model("stake", {
-    from: Input({
-      valueType: "",
-      validation: validateAddress
-    }),
-    to: Input({
-      valueType: "",
-      validation: validateAddress
-    }),
-    unitAmount: Input({
-      valueType: "",
-      validation: value => {
-        if (typeof value === "undefined") return undefined;
-        if (!isNaN(Number(value))) return undefined;
+    from: types.optional(
+      Input({
+        valueType: "",
+        validation: value => {
+          if (typeof value === "undefined") return undefined;
+          if (Web3.utils.isAddress(value)) return undefined;
 
-        return "invalid amount";
-      }
-    })
+          return "invalid 'from' address";
+        }
+      }),
+      {}
+    ),
+    to: types.optional(
+      Input({
+        valueType: "",
+        validation: value => {
+          if (typeof value === "undefined") return undefined;
+          if (Web3.utils.isAddress(value)) return undefined;
+
+          return "invalid 'to' address";
+        }
+      }),
+      {}
+    ),
+    unitAmount: types.optional(
+      Input({
+        valueType: "",
+        validation: value => {
+          if (typeof value === "undefined") return undefined;
+          if (!isNaN(Number(value))) return undefined;
+
+          return "invalid amount";
+        }
+      }),
+      {}
+    ),
+    approveTx: types.optional(Transaction, {}),
+    createtx: types.optional(Transaction, {})
   })
   .views(self => ({
     get amount() {

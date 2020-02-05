@@ -1,5 +1,5 @@
 import { when, reaction } from "mobx";
-import Hopr from "src/models/Hopr";
+import Hopr, { events } from "src/models/Hopr";
 import web3Store from "src/stores/web3";
 
 const hopr = Hopr.create();
@@ -13,30 +13,63 @@ when(
 );
 
 // update user's balance when account changes
-let previousAccount = web3Store.account;
+// let previousAccount = web3Store.account;
 reaction(
+  () => web3Store.account,
   () => {
-    if (typeof previousAccount === "undefined") return false;
-    if (previousAccount === web3Store.account) return false;
-
-    return true;
-  },
-  () => {
-    hopr.updateBalance().catch(console.error);
+    hopr.initialize().catch(console.error);
   }
 );
 
 // reset hopr when networkId changes
-let previousNetworkId = web3Store.networkId;
+let allEventsSubscription: any;
 reaction(
+  () => web3Store.networkId,
   () => {
-    if (typeof previousNetworkId === "undefined") return false;
-    if (previousNetworkId === web3Store.networkId) return false;
+    hopr
+      .initialize()
+      .then(() => {
+        events.clear();
 
-    return true;
-  },
-  () => {
-    hopr.initialize().catch(console.error);
+        if (typeof allEventsSubscription !== "undefined") {
+          try {
+            allEventsSubscription.__proto__
+              .bind(allEventsSubscription)
+              .unsubscribe();
+          } catch (error) {
+            console.error(error);
+          }
+        }
+
+        allEventsSubscription = hopr
+          .hoprChannels!.events.allEvents({
+            fromBlock: 0,
+            toBlock: "latest"
+          })
+          .on("data", async (data: any) => {
+            const block = await web3Store.web3!.eth.getBlock(data.blockNumber)!;
+            const createdAt = Number(block.timestamp) * 1e3;
+
+            events.push({
+              data,
+              createdAt
+            });
+
+            if (data.event === "OpenedChannel") {
+              return hopr.onOpenedChannel({
+                ...data.returnValues,
+                createdAt
+              });
+            } else if (data.event === "ClosedChannel") {
+              return hopr.onClosedChannel(data.returnValues);
+            } else if (data.event === "Withdrawed") {
+              return hopr.onWithdrawed(data.returnValues);
+            } else if (data.event === "InitiatedChannelClosure") {
+              return hopr.onInitiatedChannelClosure(data.returnValues);
+            }
+          });
+      })
+      .catch(console.error);
   }
 );
 

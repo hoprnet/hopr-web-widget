@@ -41,7 +41,7 @@ const Web3Model = types
       const networkId: number = yield self.web3!.eth.net.getId();
 
       return {
-        account,
+        account: Web3.utils.toChecksumAddress(account),
         networkId
       };
     })
@@ -82,7 +82,7 @@ const Web3Model = types
           })
           .on("accountsChanged", ([newAccount]: string[]) => {
             if (self.account === newAccount) return;
-            self.setAccount(newAccount);
+            self.setAccount(Web3.utils.toChecksumAddress(newAccount));
           });
       }
     }),

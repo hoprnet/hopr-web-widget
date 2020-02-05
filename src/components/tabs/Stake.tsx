@@ -10,26 +10,24 @@ import web3 from "src/stores/web3";
 import hopr from "src/stores/hopr";
 import TableModel from "src/models/Table";
 
-const store = StakesModel.create({
-  from: {
-    value: ""
-  },
-  to: {
-    value: ""
-  },
-  unitAmount: {
-    value: ""
-  }
-});
+const store = StakesModel.create();
 
 const Stakes = observer(() => {
-  const [txError, setTxError] = useState<string | undefined>(undefined);
+  const [customError, setCustomError] = useState<string | undefined>(undefined);
+
+  const loading =
+    store.approveTx.status === "PENDING" || store.createtx.status === "PENDING";
+
   const error = [
-    txError,
+    customError,
     store.from.error,
     store.to.error,
-    store.unitAmount.error
+    store.unitAmount.error,
+    store.approveTx.error,
+    store.createtx.error
   ].find(v => !!v);
+
+  const disabled = store.disabled || loading;
 
   const list = Array.from(hopr.channels.values()).filter(channel => {
     return channel.sender === web3.account;
@@ -38,7 +36,7 @@ const Stakes = observer(() => {
   const table = TableModel(list);
 
   const stake = async () => {
-    setTxError(undefined);
+    setCustomError(undefined);
 
     try {
       const funder = web3.account!;
@@ -53,7 +51,7 @@ const Stakes = observer(() => {
             amount
           });
         } else {
-          return setTxError("not enough HOPR");
+          return setCustomError("not enough HOPR");
         }
       }
 
@@ -65,21 +63,36 @@ const Stakes = observer(() => {
         )
         .call();
       if (new BN(amount).gt(new BN(allowance))) {
-        await hopr.approve({ amount });
+        await store.approveTx.run(() => {
+          return hopr
+            .hoprToken!.methods.approve(
+              hopr.hoprChannels!.options.address,
+              amount
+            )
+            .send({
+              from: web3.account
+            });
+        });
       }
 
       // create channel
-      await hopr.createChannel({
-        funder,
-        sender: store.from.value,
-        recipient: store.to.value,
-        amount
+      await store.createtx.run(() => {
+        return hopr
+          .hoprChannels!.methods.createChannel(
+            funder,
+            store.from.value,
+            store.to.value,
+            amount
+          )
+          .send({
+            from: web3.account
+          });
       });
 
-      setTxError(undefined);
+      setCustomError(undefined);
     } catch (error) {
       console.error(error);
-      setTxError("Unexpected error");
+      setCustomError("Unexpected error");
     }
   };
 
@@ -138,7 +151,7 @@ const Stakes = observer(() => {
             errored={!store.unitAmount.isOk}
           />
         </div>
-        <Button disabled={store.disabled} onClick={stake}>
+        <Button disabled={disabled} loading={loading} onClick={stake}>
           STAKE
         </Button>
         {typeof error !== "undefined" ? error : ` `}

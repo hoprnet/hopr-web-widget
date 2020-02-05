@@ -12,4 +12,8 @@ export const constants = css.global`
     fill: var(--alt-font-color);
     color: var(--alt-font-color);
   }
+
+  .loading * {
+    color: var(--alt-font-color);
+  }
 `;

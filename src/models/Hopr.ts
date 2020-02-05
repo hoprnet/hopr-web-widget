@@ -33,6 +33,7 @@ export const Channel = types
     }
   }));
 
+// TODO: move this to Hopr Model
 export const events = observable<any>([]);
 
 const Hopr = types
@@ -149,124 +150,51 @@ const Hopr = types
       channel.closureTime = closureTime;
     }
   }))
-  .actions(self => {
-    let allEventsSubscription: any;
-
-    return {
-      setHashedSecret: flow(function* createChannel() {
-        yield self
-          .hoprChannels!.methods.setHashedSecret(
-            web3Store.web3!.utils.keccak256(web3Store.web3!.utils.randomHex(32))
-          )
-          .send({
-            from: web3Store.account
-          });
-      }),
-
-      mint: flow(function* mint({
-        recipient,
-        amount
-      }: {
-        recipient: string;
-        amount: string;
-      }) {
-        yield self.hoprToken!.methods.mint(recipient, amount).send({
+  .actions(self => ({
+    setHashedSecret: flow(function* createChannel() {
+      yield self
+        .hoprChannels!.methods.setHashedSecret(
+          web3Store.web3!.utils.keccak256(web3Store.web3!.utils.randomHex(32))
+        )
+        .send({
           from: web3Store.account
         });
-      }),
+    }),
 
-      approve: flow(function* createChannel({ amount }: { amount: string }) {
-        yield self
-          .hoprToken!.methods.approve(
-            self.hoprChannels!.options.address,
-            amount
-          )
-          .send({
-            from: web3Store.account
-          });
-      }),
+    mint: flow(function* mint({
+      recipient,
+      amount
+    }: {
+      recipient: string;
+      amount: string;
+    }) {
+      yield self.hoprToken!.methods.mint(recipient, amount).send({
+        from: web3Store.account
+      });
+    }),
 
-      createChannel: flow(function* createChannel({
-        funder,
-        sender,
-        recipient,
-        amount
-      }: {
-        funder: string;
-        sender: string;
-        recipient: string;
-        amount: string;
-      }) {
-        yield self
-          .hoprChannels!.methods.createChannel(
-            funder,
-            sender,
-            recipient,
-            amount
-          )
-          .send({
-            from: web3Store.account
-          });
-      }),
+    initialize: flow(function* initialize() {
+      self.hoprToken = getContract({
+        web3: web3Store.web3!,
+        name: "HoprToken",
+        networkId: web3Store.networkId!
+      });
 
-      initialize: flow(function* initialize() {
-        self.hoprToken = getContract({
-          web3: web3Store.web3!,
-          name: "HoprToken",
-          networkId: web3Store.networkId!
-        });
+      self.hoprChannels = getContract({
+        web3: web3Store.web3!,
+        name: "HoprChannels",
+        networkId: web3Store.networkId!
+      });
 
-        self.hoprChannels = getContract({
-          web3: web3Store.web3!,
-          name: "HoprChannels",
-          networkId: web3Store.networkId!
-        });
+      if (!web3Store.unlocked) {
+        yield web3Store.unlock();
+      }
 
-        if (!web3Store.unlocked) {
-          yield web3Store.unlock();
-        }
-
-        if (web3Store.unlocked) {
-          // get balance
-          yield self.updateBalance();
-        }
-
-        // listen to hopr events
-        if (typeof allEventsSubscription !== "undefined") {
-          allEventsSubscription.__proto__
-            .bind(allEventsSubscription)
-            .unsubscribe();
-        }
-
-        allEventsSubscription = self.hoprChannels.events
-          .allEvents({
-            fromBlock: 0,
-            toBlock: "latest"
-          })
-          .on("data", async (data: any) => {
-            const block = await web3Store.web3!.eth.getBlock(data.blockNumber)!;
-            const createdAt = Number(block.timestamp) * 1e3;
-
-            events.push({
-              data,
-              createdAt
-            });
-
-            if (data.event === "OpenedChannel") {
-              return self.onOpenedChannel({
-                ...data.returnValues,
-                createdAt
-              });
-            } else if (data.event === "ClosedChannel") {
-              return self.onClosedChannel(data.returnValues);
-            } else if (data.event === "Withdrawed") {
-              return self.onWithdrawed(data.returnValues);
-            } else if (data.event === "InitiatedChannelClosure") {
-              return self.onInitiatedChannelClosure(data.returnValues);
-            }
-          });
-      })
-    };
-  });
+      if (web3Store.unlocked) {
+        // get balance
+        yield self.updateBalance();
+      }
+    })
+  }));
 
 export default Hopr;

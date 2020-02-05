@@ -1,11 +1,17 @@
 import React from "react";
+import Loading from "src/components/Loading";
+
+interface IButton extends React.ButtonHTMLAttributes<any> {
+  loading?: boolean;
+}
 
 const Button = ({
   children,
   style,
   onClick,
-  disabled
-}: React.ButtonHTMLAttributes<any>) => {
+  disabled,
+  loading = false
+}: IButton) => {
   return (
     <div
       className={`button ${disabled ? "button-disabled" : ""}`}
@@ -19,9 +25,11 @@ const Button = ({
       }}
     >
       {children}
+      {loading ? <Loading /> : null}
 
       <style jsx>{`
         .button {
+          position: relative;
           background: var(--primary-color);
           border: 2px solid var(--btn-border);
           color: var(--alt-font-color);
