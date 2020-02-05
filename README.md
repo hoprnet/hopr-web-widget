@@ -6,4 +6,4 @@ HOPR is a privacy-preserving messaging protocol that incentivizes users to parti
 
 ## hopr-web-widget
 
-Provides a graphical user interface to interact with the [`hopr.network`](https://hopr.network) dApp.
+Provides a graphical user interface to interact with the [`hopr.network`](https://hopr.network) [dApp](https://ethereum.stackexchange.com/questions/383/what-is-a-dapp).
