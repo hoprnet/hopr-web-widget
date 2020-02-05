@@ -18,9 +18,8 @@ const Stats = observer(() => {
             nodes (solid line) and the number of open payment channels
           </div>
         </div>
-        {/* <div className="chart">[coming soon...]</div> */}
         <div className="chart">
-          <Chart />
+          {table.rows.length > 2 ? <Chart /> : "not enough events"}
         </div>
       </div>
 

@@ -141,7 +141,7 @@ const Stakes = observer(() => {
         <Button disabled={store.disabled} onClick={stake}>
           STAKE
         </Button>
-        {typeof error !== "undefined" ? error : null}
+        {typeof error !== "undefined" ? error : ` `}
       </div>
 
       <div className="table-container">

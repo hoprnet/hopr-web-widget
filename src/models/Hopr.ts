@@ -251,7 +251,6 @@ const Hopr = types
               data,
               createdAt
             });
-            console.log("pushed");
 
             if (data.event === "OpenedChannel") {
               return self.onOpenedChannel({

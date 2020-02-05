@@ -6,24 +6,29 @@ import Web3 from "web3";
 import { events } from "src/models/Hopr";
 import "./styles.css";
 
-var svg,
-  timeScale,
-  amountScale,
-  countScale,
-  width,
-  height,
-  margin,
-  chartData,
-  tooltipDimensions,
-  focus;
-var xAxis, yAxisAmount, yAxisCount, amountLine, countLine;
-var dateFormat = d3.timeFormat("%b %d");
-var fullMonthDateFormat = d3.timeFormat("%b %d, %Y");
-var bisectDate = d3.bisector(function(d) {
+const dateFormat = d3.timeFormat("%b %d");
+const fullMonthDateFormat = d3.timeFormat("%b %d, %Y");
+const bisectDate = d3.bisector(d => {
   return d.date;
 }).left;
 
-const initChart = () => {
+let svg;
+let timeScale;
+let amountScale;
+let countScale;
+let width;
+let height;
+let margin;
+let chartData;
+let tooltipDimensions;
+let focus;
+let xAxis;
+let yAxisAmount;
+let yAxisCount;
+let amountLine;
+let countLine;
+
+function initChart() {
   margin = { top: 30, right: 70, bottom: 30, left: 60 };
   width =
     document.getElementById("chart-container").offsetWidth -
@@ -63,14 +68,13 @@ const initChart = () => {
     .y(function(d) {
       return countScale(d.aggCount);
     });
-};
+}
 
 function parseAmount(amount) {
   return amount / 10000;
 }
 
 function updateChart(data) {
-  console.log("TCL: updateChart -> data", data);
   chartData = data;
   d3.selectAll(".chart-content").remove();
 
@@ -231,11 +235,15 @@ function setOverlayTooltip() {
 }
 
 function mousemove() {
-  var x0 = timeScale.invert(d3.mouse(this)[0]),
-    i = bisectDate(chartData, x0, 1),
-    d0 = chartData[i - 1],
-    d1 = chartData[i],
-    d = x0 - d0.time > d1.time - x0 ? d1 : d0;
+  var x0 = timeScale.invert(d3.mouse(this)[0]);
+  var i = bisectDate(chartData, x0, 1);
+  if (i > chartData.length - 1) {
+    return;
+  }
+
+  var d0 = chartData[i - 1];
+  var d1 = chartData[i];
+  var d = x0 - d0.time > d1.time - x0 ? d1 : d0;
 
   var x = timeScale(d.date);
   var yAmount = amountScale(d.aggAmount);
@@ -267,14 +275,6 @@ function mousemove() {
   focus.select("#tooltip-count").text(d.aggCount);
 }
 
-function zeroFill(number) {
-  if (number < 10) {
-    return "0" + number;
-  } else {
-    return String(number);
-  }
-}
-
 function aggregateRecords(records) {
   var channelAmmountBalance = 0;
   var channelStatusCount = 0;
@@ -293,19 +293,13 @@ function aggregateRecords(records) {
       channelAmmountBalance -= recordEventAmount;
     }
 
-    console.log(record.time);
     var recordDate = new Date(record.time);
-
-    console.log({
-      aggCount: channelStatusCount,
-      aggAmount: channelAmmountBalance,
-      date: recordDate
-    });
 
     aggregatedRecords.push(
       Object.assign({}, records[i], {
+        amount: Web3.utils.fromWei(String(recordEventAmount), "ether"),
         aggCount: channelStatusCount,
-        aggAmount: channelAmmountBalance,
+        aggAmount: Web3.utils.fromWei(String(channelAmmountBalance), "ether"),
         date: recordDate
       })
     );
@@ -334,15 +328,13 @@ function renderRecords(hoprEvents) {
 
       return {
         type: event.data.event,
-        amount: Web3.utils.fromWei(String(amount), "ether"),
+        amount,
         time: time
       };
     });
 
-  console.log(events);
-
   var orderedRecords = events.sort(function(a, b) {
-    return a.createdAt - b.createdAt;
+    return a.time - b.time;
   });
 
   var aggregatedRecords = aggregateRecords(orderedRecords);
@@ -366,8 +358,11 @@ class Chart extends React.Component {
     initChart();
 
     reaction(
-      () => events.length > 3,
-      () => renderRecords(events)
+      () => events.length > 2,
+      () => renderRecords(events),
+      {
+        fireImmediately: true
+      }
     );
   }
 

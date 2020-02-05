@@ -7,4 +7,9 @@ export const constants = css.global`
       monospace;
     color: var(--font-color);
   }
+
+  .icon path {
+    fill: var(--alt-font-color);
+    color: var(--alt-font-color);
+  }
 `;
