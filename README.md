@@ -8,8 +8,6 @@ HOPR is a privacy-preserving messaging protocol that incentivizes users to parti
 
 Provides a graphical user interface to interact with the [`hopr.network`](https://hopr.network) [dApp](https://ethereum.stackexchange.com/questions/383/what-is-a-dapp).
 
----
-
 ## Table of Contents:
 
 - [Requirements](#requirements)
