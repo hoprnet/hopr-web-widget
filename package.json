@@ -1,7 +1,13 @@
 {
-  "name": "widget-refactor",
+  "name": "@hoprnet/hopr-web-widget",
+  "homepage": "https://hopr.network",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hoprnet/hopr-web-widget.git"
+  },
+  "license": "LGPL-3.0-only",
+  "description": "Graphic interface for the hopr.network dApp",
   "version": "0.1.0",
-  "private": true,
   "dependencies": {
     "@material-ui/core": "^4.9.0",
     "@material-ui/icons": "^4.5.1",
@@ -14,6 +20,9 @@
     "react-dom": "^16.12.0",
     "styled-jsx": "^3.2.4",
     "web3": "^1.2.5"
+  },
+  "engines": {
+    "yarn": "^1.21.0"
   },
   "scripts": {
     "start": "react-app-rewired start",
