@@ -10,11 +10,14 @@ Provides a graphical user interface to interact with the [`hopr.network`](https:
 
 - [HOPR net](#hopr-net)
   - [hopr-web-widget](#hopr-web-widget)
-- [Requirements](#requirements)
-- [Install](#install)
-- [Development](#development)
-- [Building](#building)
+  - [Table of Contents:](#table-of-contents)
+- [Setup](#setup)
+  - [Requirements](#requirements)
+  - [Install](#install)
+  - [Development](#development)
+  - [Building](#building)
 
+# Setup
 
 ## Requirements
 
