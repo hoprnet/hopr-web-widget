@@ -1,12 +1,12 @@
 {
   "name": "@hoprnet/hopr-web-widget",
-  "homepage": "https://hopr.network",
+  "homepage": "https://hoprnet.io",
   "repository": {
     "type": "git",
     "url": "https://github.com/hoprnet/hopr-web-widget.git"
   },
   "license": "LGPL-3.0-only",
-  "description": "Graphic interface for the hopr.network dApp",
+  "description": "Graphic interface for the hoprnet dApp",
   "version": "0.1.0",
   "dependencies": {
     "@material-ui/core": "^4.9.0",
